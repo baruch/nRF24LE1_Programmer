@@ -276,7 +276,7 @@ void read_mainpage() {
   Serial.println("READY READ MAINPAGE");
   Serial.println("SETTING UP");
 
-  // Put nRF24LE1 into programming mode
+ // Put nRF24LE1 into programming mode
   progStart();
 
   // Set InfoPage bit so InfoPage flash is read
@@ -364,6 +364,8 @@ void tri_state_pin(int pin) {
 // the nRF
 void disable_nrf_pins() {
   // PROG and RESET are untouched since they need to be maintained to prevent issues and are not used otherwise.
+
+  nRF24LE1Serial.end();
 
   tri_state_pin(0);
   tri_state_pin(1);
