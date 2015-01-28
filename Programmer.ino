@@ -48,12 +48,6 @@ SoftwareSerial nRF24LE1Serial(nRF24LE1_RXD, nRF24LE1_TXD);
 #endif
 #define NRF24LE1_BAUD  38400
 
-#define FLASH_TRIGGER   0x01    // Magic character to trigger uploading of flash
-#define READ_INFOPAGE_TRIGGER 0x02
-#define READ_MAINPAGE_TRIGGER 0x04
-#define RESTORE_INFOPAGE_TRIGGER 0x05
-
-
 // Hex file processing definitions
 #define HEX_REC_START_CODE             ':'
 
@@ -86,6 +80,7 @@ hexRecordStruct hexRecord;  // Decoded hex data
 size_t numChars;   // Serial characters received counter
 byte infopage[37]; // Buffer for storing InfoPage content
 
+char serialBuffer;
 
 byte ConvertHexASCIIDigitToByte(char c){
   if((c >= 'a') && (c <= 'f'))
@@ -250,14 +245,7 @@ done:
 void read_infopage() {
   progSetup();
 
-  Serial.println("READY READ INFOPAGE");
-  // Wait for GO command from Serial
-  while (!Serial.find("GO")) {
-    Serial.println("READY");
-  }
-  Serial.println("PREPARING");
-  delay(1000);
-  Serial.println("SETTING UP");
+  Serial.println("READING INFOPAGE");
 
   // Put nRF24LE1 into programming mode
   progStart();
@@ -286,12 +274,6 @@ void read_mainpage() {
   progSetup();
 
   Serial.println("READY READ MAINPAGE");
-  // Wait for GO command from Serial
-  while (!Serial.find("GO")) {
-    Serial.println("READY");
-  }
-  Serial.println("PREPARING");
-  delay(1000);
   Serial.println("SETTING UP");
 
   // Put nRF24LE1 into programming mode
@@ -342,9 +324,10 @@ void restore_infopage() {
   progSetup();
 
   Serial.println("READY RESTORE INFOPAGE");
-  while (!Serial.find("GO")) {
-    Serial.println("READY");
-  };
+  if (!Serial.find("GO\n")) {
+    Serial.println("TIMEOUT");
+    return;
+  }
 
   // Put nRF24LE1 into programming mode
   progStart();
@@ -377,60 +360,96 @@ void setup() {
   Serial.begin(115200);
   Serial.setTimeout(30000);
 
-  // Reset nRF24LE1
   pinMode(PROG, OUTPUT);
   digitalWrite(PROG, LOW);
+
   pinMode(_RESET_, OUTPUT);
+  digitalWrite(_RESET_, LOW);
+
+  disable_nrf_pins();
+}
+
+void reset_nrf() {
+  Serial.println("Resetting nRF24");
+
+  digitalWrite(PROG, LOW);
+
   digitalWrite(_RESET_, HIGH);
   delay(10);
   digitalWrite(_RESET_, LOW);
   delay(10);
   digitalWrite(_RESET_, HIGH);
 
-
-  nRF24LE1Serial.begin(NRF24LE1_BAUD);
+  Serial.println("RESET DONE");
 }
 
-char serialBuffer;
+void serial_monitor() {
+  nRF24LE1Serial.begin(NRF24LE1_BAUD);
 
-void loop() {
-
-  if (nRF24LE1Serial.available() > 0) {
-    // Pass through serial data receieved from the nRF24LE1
-    Serial.write(nRF24LE1Serial.read());
+  while (1) {
+    if (nRF24LE1Serial.available() > 0) {
+      // Pass through serial data receieved from the nRF24LE1
+      Serial.write(nRF24LE1Serial.read());
+    }
+    if (Serial.available() > 0) {
+      serialBuffer = Serial.read();
+      if (serialBuffer == 0x01)
+        break;
+      nRF24LE1Serial.write(serialBuffer);
+    }
   }
 
+  nRF24LE1Serial.end();
+}
+
+#define HELP_MSG \
+  "Help Screen\r\n" \
+  "-----------\r\n" \
+  "\r\n" \
+  "h -- Help screen (this screen)\r\n" \
+  "f -- Flash IHX to the nRF24 module\r\n" \
+  "r -- Reset the nRF24 module\r\n" \
+  "i -- Read the Info Page\r\n" \
+  "m -- Read the Main Pages (code)\r\n" \
+  "T -- Restore the Info Page (Only use if you erased the info page!)\r\n" \
+  "s -- Serial monitor, exit by sending the binary character 0x01\r\n" \
+  "\r\n"
+
+void loop() {
   if (Serial.available() > 0) {
     serialBuffer = Serial.read();
     // Check if data received on USB serial port is the magic character to start flashing
     switch (serialBuffer) {
-    case FLASH_TRIGGER:
-      nRF24LE1Serial.end();
+    case 'h':
+    case '?':
+      Serial.write(HELP_MSG);
+      break;
+
+    case 'f':
       flash();
-      nRF24LE1Serial.begin(NRF24LE1_BAUD);
       break;
 
-    case READ_INFOPAGE_TRIGGER:
-      nRF24LE1Serial.end();
+    case 'i':
       read_infopage();
-      nRF24LE1Serial.begin(NRF24LE1_BAUD);
       break;
 
-    case READ_MAINPAGE_TRIGGER:
-      nRF24LE1Serial.end();
+    case 'm':
       read_mainpage();
-      nRF24LE1Serial.begin(NRF24LE1_BAUD);
       break;
 
-    case RESTORE_INFOPAGE_TRIGGER:
-      nRF24LE1Serial.end();
+    case 'T':
       restore_infopage();
-      nRF24LE1Serial.begin(NRF24LE1_BAUD);
       break;
 
-    default:
-      // Otherwise pass through serial data received
-      nRF24LE1Serial.write(serialBuffer);
+    case 'r':
+      reset_nrf();
+      break;
+
+    case 's':
+      serial_monitor();
+      break;
     }
+
+    Serial.write("\r\n> ");
   }
 }

@@ -42,15 +42,7 @@ open(SERIAL, "+<", $ARGV[0]) or die "Cannot open $ARGV[0]: $!";
 sleep(3);
 
 #Send the read infopage trigger character
-print SERIAL "\x02";
-
-do {
-  while (!defined($_ = <SERIAL>)) {}
-  print;
-  chomp;
-} until /READY/;
-
-print SERIAL "GO\n";
+print SERIAL "i";
 
 while (1) {
 

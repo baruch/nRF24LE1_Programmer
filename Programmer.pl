@@ -58,7 +58,7 @@ open(SERIAL, "+<", $port) or die "Cannot open $port: $!";
 #sleep(3);
 
 #Send the flash trigger character
-print SERIAL "\x01";
+print SERIAL "f";
 
 do {
   while (!defined($_ = <SERIAL>)) {}

@@ -38,11 +38,8 @@ system "stty -F $ARGV[0] 10:0:18b1:0:3:1c:7f:15:4:0:1:0:11:13:1a:0:12:f:17:16:0:
 
 open(SERIAL, "+<", $ARGV[0]) or die "Cannot open $ARGV[0]: $!";
 
-#Wait for Arduino reset
-sleep(3);
-
 #Send the restore infopage trigger character
-print SERIAL "\x05";
+print SERIAL "T";
 
 do {
   while (!defined($_ = <SERIAL>)) {}
