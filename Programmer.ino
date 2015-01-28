@@ -376,7 +376,7 @@ done:
 
 void setup() {
   // start serial port:
-  Serial.begin(57600);
+  Serial.begin(115200);
   Serial.setTimeout(30000);
 
   // Reset nRF24LE1
