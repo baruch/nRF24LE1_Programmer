@@ -46,7 +46,7 @@ SoftwareSerial nRF24LE1Serial(nRF24LE1_RXD, nRF24LE1_TXD);
 #else
 #define nRF24LE1Serial Serial1
 #endif
-#define NRF24LE1_BAUD  19200
+#define NRF24LE1_BAUD  38400
 
 #define FLASH_TRIGGER   0x01    // Magic character to trigger uploading of flash
 #define READ_INFOPAGE_TRIGGER 0x02
