@@ -26,18 +26,33 @@
 use strict;
 use warnings;
 
+my $port = '';
 
-if (@ARGV != 2) {
+my @port_globs = ('/dev/ttyACM*', '/dev/ttyUSB*', '/dev/tty.usbserial*', '/dev/tty.usbmodem*');
+for my $port_glob (@port_globs) {
+        my @ports = glob($port_glob);
+        if (@ports) {
+                $port = $ports[0];
+        }
+}
+
+if (@ARGV == 2) {
+        $port = $ARGV[1];
+        print "Using user supplied port $port\n";
+} elsif (@ARGV == 1) {
+        print "Using detected port $port\n";
+} elsif (@ARGV != 2) {
   print "Usage: $0 <Hex.file> <Arduino Serial Port>\n";
   exit;
 }
+my $hex = $ARGV[0];
 
 # Serial port settings to suit Arduino
-system "stty -F $ARGV[1] 10:0:18b1:0:3:1c:7f:15:4:0:1:0:11:13:1a:0:12:f:17:16:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0";
+system "stty -F $port 10:0:18b1:0:3:1c:7f:15:4:0:1:0:11:13:1a:0:12:f:17:16:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0";
 
 
-open(HEX, "<", $ARGV[0]) or die "Cannot open $ARGV[0]: $!";
-open(SERIAL, "+<", $ARGV[1]) or die "Cannot open $ARGV[1]: $!";
+open(HEX, "<", $hex) or die "Cannot open $hex: $!";
+open(SERIAL, "+<", $port) or die "Cannot open $port: $!";
 
 #Wait for Arduino reset
 #sleep(3);
