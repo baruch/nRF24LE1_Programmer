@@ -34,7 +34,7 @@
 #include <SPI.h>
 #include <SoftwareSerial.h>
 
-#include "../common/common.c"
+#include "common.inc"
 
 // nRF24LE1 Serial port connections.  These will differ with the different chip
 // packages
