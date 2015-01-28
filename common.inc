@@ -6,17 +6,17 @@
   NOTE: nRF24LE1 is a 3.3V device.  Level converters are required to connect it to a
   5V Arduino.
 
- * D00: Serial RX
- * D01: Serial TX
+ * D00: nRF24LE1 UART/TXD
+ * D01: nRF24LE1 UART/RXD
  * D02:
  *~D03:
  * D04:
  *~D05:
  *~D06:
- * D07: nRF24LE1 UART/RXD
+ * D07:
  * D08: nRF24LE1 PROG
  *~D09: nRF24LE1 _RESET_
- *~D10: nRF24LE1 FCSN, nRF24LE1 UART/TXD (P0.5)
+ *~D10: nRF24LE1 FCSN (P0.5)
  *~D11: SPI MOSI, nRF24LE1 FMOSI
  * D12: SPI MISO, nRF24LE1 FMISO
  * D13: SPI SCK, On board Status LED, nRF24LE1 FSCK
@@ -96,6 +96,7 @@ void progSet(uint8_t val) {
   digitalWrite(PROG, val);
   Serial.print("PROG SET ");
   Serial.println(val);
+
   digitalWrite(_RESET_, LOW);
   delay(10);
   digitalWrite(_RESET_, HIGH);
