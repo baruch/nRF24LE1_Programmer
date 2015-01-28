@@ -40,7 +40,7 @@ open(HEX, "<", $ARGV[0]) or die "Cannot open $ARGV[0]: $!";
 open(SERIAL, "+<", $ARGV[1]) or die "Cannot open $ARGV[1]: $!";
 
 #Wait for Arduino reset
-sleep(3);
+#sleep(3);
 
 #Send the flash trigger character
 print SERIAL "\x01";
