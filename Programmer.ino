@@ -392,7 +392,7 @@ void setup() {
   digitalWrite(PROG, LOW);
 
   pinMode(_RESET_, OUTPUT);
-  digitalWrite(_RESET_, LOW);
+  digitalWrite(_RESET_, HIGH);
 
   disable_nrf_pins();
 }
