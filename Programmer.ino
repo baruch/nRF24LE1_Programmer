@@ -84,8 +84,6 @@ hexRecordStruct;
 hexRecordStruct hexRecord;  // Decoded hex data
 
 size_t numChars;   // Serial characters received counter
-byte fsr;          // Flash status register buffer
-byte spi_data;     // SPI data transfer buffer
 byte infopage[37]; // Buffer for storing InfoPage content
 
 
