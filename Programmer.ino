@@ -354,6 +354,32 @@ done:
   Serial.println("DONE");
 }
 
+void tri_state_pin(int pin) {
+  pinMode(pin, INPUT);
+  digitalWrite(pin, LOW);
+}
+
+// In order to allow the nRF to communicate with peripherals that are connected
+// to it we should disable all loading from our pins that may interfere with
+// the nRF
+void disable_nrf_pins() {
+  // PROG and RESET are untouched since they need to be maintained to prevent issues and are not used otherwise.
+
+  tri_state_pin(0);
+  tri_state_pin(1);
+  tri_state_pin(2);
+  tri_state_pin(3);
+  tri_state_pin(4);
+  tri_state_pin(5);
+  tri_state_pin(6);
+  tri_state_pin(7);
+  // 8 is PROG
+  // 9 is _RESET_
+  tri_state_pin(10);
+  tri_state_pin(11);
+  tri_state_pin(12);
+  tri_state_pin(13);
+}
 
 void setup() {
   // start serial port:
@@ -450,6 +476,7 @@ void loop() {
       break;
     }
 
+    disable_nrf_pins();
     Serial.write("\r\n> ");
   }
 }
