@@ -476,6 +476,14 @@ void loop() {
     case 's':
       serial_monitor();
       break;
+
+    default:
+      Serial.print("Unknown command '");
+      Serial.print(serialBuffer);
+      Serial.print("' (value ");
+      Serial.print((unsigned)serialBuffer);
+      Serial.println(")");
+      break;
     }
 
     disable_nrf_pins();
