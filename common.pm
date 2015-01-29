@@ -13,22 +13,23 @@ sub find_port {
 sub setup_port {
   my $port = shift;
   system("stty -F $port cs8 115200 ignbrk -brkint -icrnl -imaxbel -opost -onlcr -isig -icanon -iexten -echo -echoe -echok -echoctl -echoke noflsh -ixon -crtscts");
-  open(my $SERIAL, "+<", $port) or die "Cannot open $port: $!";
-  return $SERIAL;
+  local *SERIAL;
+  open(SERIAL, "+<", $port) or die "Cannot open $port: $!";
+  return *SERIAL;
 }
 
 sub dump_only {
-  my $port = shift;
-  my $trigger = shift;
+  local $port = shift;
+  local $trigger = shift;
 
-  my $SERIAL = setup_port($port);
+  local *SERIAL = setup_port($port);
 
   #Send the read infopage trigger character
-  print $SERIAL $trigger;
+  print SERIAL $trigger;
 
   while (1) {
 
-    while (!defined($_ = <$SERIAL>)) {}
+    while (!defined($_ = <SERIAL>)) {}
 
     print;
     chomp;
@@ -36,7 +37,7 @@ sub dump_only {
     last if /DONE/;
   }
 
-  close($SERIAL);
+  close(SERIAL);
 }
 
 @EXPORT = qw(setup_port find_port dump_only);
