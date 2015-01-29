@@ -12,7 +12,7 @@ sub find_port {
 
 sub setup_port {
   my $port = shift;
-  system("stty -F $port cs8 115200 ignbrk -brkint -icrnl -imaxbel -opost -onlcr -isig -icanon -iexten -echo -echoe -echok -echoctl -echoke noflsh -ixon -crtscts");
+  system("stty -F $port cs8 57600 ignbrk -brkint -icrnl -imaxbel -opost -onlcr -isig -icanon -iexten -echo -echoe -echok -echoctl -echoke noflsh -ixon -crtscts");
   local *SERIAL;
   open(SERIAL, "+<", $port) or die "Cannot open $port: $!";
   print SERIAL "\x01"; # Exit serial monitor if in it

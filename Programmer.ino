@@ -385,7 +385,7 @@ void disable_nrf_pins() {
 
 void setup() {
   // start serial port:
-  Serial.begin(115200);
+  Serial.begin(57600);
   Serial.setTimeout(30000);
 
   pinMode(PROG, OUTPUT);
