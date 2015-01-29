@@ -477,9 +477,16 @@ void loop() {
       serial_monitor();
       break;
 
+    case '\r':
+    case '\n':
+      break;
+
     default:
       Serial.print("Unknown command '");
-      Serial.print(serialBuffer);
+      if (isprint(serialBuffer))
+        Serial.print(serialBuffer);
+      else
+        Serial.print('.');
       Serial.print("' (value ");
       Serial.print((unsigned)serialBuffer);
       Serial.println(")");
