@@ -26,29 +26,14 @@
 use strict;
 use warnings;
 
+use common;
 
-if (@ARGV != 1) {
+my $port = common::find_port();
+if (@ARGV != 1 && !$port) {
   print "Usage: $0 <Arduino Serial Port>\n";
   exit;
 }
 
 # Serial port settings to suit Arduino
-system "stty -F $ARGV[0] 10:0:18b1:0:3:1c:7f:15:4:0:1:0:11:13:1a:0:12:f:17:16:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0";
-
-
-open(SERIAL, "+<", $ARGV[0]) or die "Cannot open $ARGV[0]: $!";
-
-#Send the read mainpage trigger character
-print SERIAL "m";
-
-while (1) {
-
-  while (!defined($_ = <SERIAL>)) {}
-
-  print;
-  chomp;
-
-  last if /DONE/;
-}
-
-close(SERIAL);
+print "Using port $port\n";
+common::dump_only($port, "m");
