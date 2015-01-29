@@ -15,6 +15,7 @@ sub setup_port {
   system("stty -F $port cs8 115200 ignbrk -brkint -icrnl -imaxbel -opost -onlcr -isig -icanon -iexten -echo -echoe -echok -echoctl -echoke noflsh -ixon -crtscts");
   local *SERIAL;
   open(SERIAL, "+<", $port) or die "Cannot open $port: $!";
+  print SERIAL "\x01"; # Exit serial monitor if in it
   return *SERIAL;
 }
 
