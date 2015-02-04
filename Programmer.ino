@@ -290,10 +290,9 @@ void writehex(uint8_t val) {
 
 byte dataline[16];
 
-void read_mainpage() {
+void read_data_page(uint16_t addr, uint32_t len) {
   progSetup();
 
-  Serial.println("READY READ MAINPAGE");
   Serial.println("SETTING UP");
 
  // Put nRF24LE1 into programming mode
@@ -307,9 +306,9 @@ void read_mainpage() {
   Serial.println("READING...");
   digitalWrite(_FCSN_, LOW);
   SPI.transfer(READ);
-  SPI.transfer(0);
-  SPI.transfer(0);
-  for (int index = 0; index < 16*1024; index += 16) {
+  SPI.transfer(addr & 0xFF);
+  SPI.transfer((uint8_t)(addr >> 8));
+  for (uint32_t index = 0; index < len; index += 16) {
     bool allones = true;
     for (int j = 0; j < 16; j++) {
         dataline[j] = SPI.transfer(0x00);
@@ -344,6 +343,15 @@ done:
   Serial.println("DONE");
 }
 
+void read_mainpage() {
+  Serial.println("READY READ MAINPAGE");
+  read_data_page(0x0000, 16*1024);
+}
+
+void read_nvm() {
+  Serial.println("READY READ NVM");
+  read_data_page(0x4400, 512);
+}
 
 static byte restore_infopage_data[37] =
 {
@@ -478,6 +486,7 @@ void serial_monitor() {
   "r -- Reset the nRF24 module\r\n" \
   "i -- Read the Info Page\r\n" \
   "m -- Read the Main Pages (code)\r\n" \
+  "n -- Read nvram\r\n" \
   "T -- Restore the Info Page (Only use if you erased the info page!)\r\n" \
   "s -- Serial monitor, exit by sending the binary character 0x01\r\n" \
   "\r\n"
@@ -502,6 +511,10 @@ void loop() {
 
     case 'm':
       read_mainpage();
+      break;
+
+    case 'n':
+      read_nvm();
       break;
 
     case 'T':
