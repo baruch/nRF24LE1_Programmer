@@ -270,6 +270,26 @@ done:
   Serial.println("DONE");
 }
 
+void writenibble(uint8_t nibble)
+{
+  if (nibble < 10)
+        Serial.print((char)('0' + nibble));
+  else
+        Serial.print((char)('a' + nibble - 10));
+}
+
+void writehex(uint8_t val) {
+  uint8_t nibble;
+
+  nibble = val >> 4;
+  writenibble(nibble);
+
+  nibble = val & 0xF;
+  writenibble(nibble);
+}
+
+byte dataline[16];
+
 void read_mainpage() {
   progSetup();
 
@@ -289,13 +309,32 @@ void read_mainpage() {
   SPI.transfer(READ);
   SPI.transfer(0);
   SPI.transfer(0);
-  for (int index = 0; index < 16*1024; index++) {
-    byte spi_data = SPI.transfer(0x00);
-    Serial.print(index);
-    Serial.print(": ");
-    Serial.println(spi_data);
+  for (int index = 0; index < 16*1024; index += 16) {
+    bool allones = true;
+    for (int j = 0; j < 16; j++) {
+        dataline[j] = SPI.transfer(0x00);
+        if (dataline[j] != 255)
+            allones = false;
+    }
+
+    if (allones == false) {
+        uint16_t checksum = 16 + (byte)(index >> 8) + (index&0xFF);
+        Serial.print(":10");
+        writehex(index>>8);
+        writehex(index & 0xFF);
+        Serial.print("00");
+        for (int j = 0; j < 16; j++) {
+            writehex(dataline[j]);
+            checksum += dataline[j];
+        }
+
+        checksum &= 0xFF;
+        writehex(((0xff - checksum) & 0xFF) +1);
+        Serial.println("");
+    }
   }
   digitalWrite(_FCSN_, HIGH);
+  Serial.println(":00000001FF");
 
 done:
 
