@@ -170,6 +170,18 @@ bool disableInfoPage() {
   return true;
 }
 
+// This verifies that our wiring is ok and that we manage to communicate with
+// the slave SPI device by writing and reading to the FSR.
+bool checkFSR() {
+  if (!enableInfoPage())
+    return false;
+
+  if (!disableInfoPage())
+    return false;
+
+  return true;
+}
+
 void waitForFlashReady(int msec) {
   // Check flash is ready
   byte i = 0;

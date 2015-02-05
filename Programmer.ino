@@ -298,6 +298,12 @@ void read_data_page(uint16_t addr, uint32_t len) {
  // Put nRF24LE1 into programming mode
   progStart();
 
+  if (!checkFSR())
+    goto done;
+
+  Serial.print("FSR ");
+  Serial.println(readFSR());
+
   // Set InfoPage bit so InfoPage flash is read
   if (!disableInfoPage())
     goto done;
