@@ -148,12 +148,15 @@ bool enableInfoPage() {
 
 bool disableInfoPage() {
   byte fsr1 = readFSR();
-  writeFSR(fsr1 & ~FSR_INFEN);
   if (fsr1 == 255) {
     Serial.println("FSR READ AS 255, CHECK YOUR WIRING!");
     return false;
   }
 
+  if ((fsr1 & FSR_INFEN) == 0)
+    return true;
+
+  writeFSR(fsr1 & ~FSR_INFEN);
   byte fsr2 = readFSR();
   if ((fsr2 & FSR_INFEN) != 0) {
     Serial.print("INFOPAGE DISABLE FAILED (FSR BEFORE = ");
