@@ -465,6 +465,8 @@ void reset_nrf() {
 }
 
 void serial_monitor() {
+  pinMode(nRF24LE1_TXD, OUTPUT);
+  pinMode(nRF24LE1_RXD, INPUT);
   nRF24LE1Serial.begin(NRF24LE1_BAUD);
 
   while (1) {
@@ -481,6 +483,7 @@ void serial_monitor() {
   }
 
   nRF24LE1Serial.end();
+  disable_nrf_pins();
 }
 
 #define HELP_MSG \
