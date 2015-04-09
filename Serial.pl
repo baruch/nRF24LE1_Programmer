@@ -27,6 +27,11 @@ use warnings;
 
 use common;
 
+# Make STDOUT auto-flushing when output is piped
+my $old_fh = select(STDOUT);
+$| = 1;
+select($old_fh);
+
 my $port = common::find_port();
 if (@ARGV != 1 && !$port) {
   print "Usage: $0 <Arduino Serial Port>\n";
